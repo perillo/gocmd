@@ -25,7 +25,7 @@ func main() {
 		return
 	}
 
-	stdout, err := invoke.Go(nil, os.Args[1], os.Args[2:]...)
+	stdout, err := invoke.Go(os.Args[1], os.Args[2:], nil)
 	if err != nil {
 		log.Print(indented(err, prefix, indent))
 	}

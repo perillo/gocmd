@@ -40,12 +40,12 @@ type Attr struct {
 // stdout content and a nil error.  The stderr content will be ignored, unless
 // the GOCMDDEBUG environment variable is not empty, in which case it will be
 // logged using the log package.
-func Go(attr *Attr, verb string, args ...string) ([]byte, error) {
-	args = append([]string{verb}, args...)
+func Go(verb string, argv []string, attr *Attr) ([]byte, error) {
+	argv = append([]string{verb}, argv...)
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
 
-	cmd := exec.Command("go", args...)
+	cmd := exec.Command("go", argv...)
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
 	if attr != nil {
@@ -57,13 +57,13 @@ func Go(attr *Attr, verb string, args ...string) ([]byte, error) {
 		// Just return the error, including the stderr output as is.
 		// Make sure to also return the stdout content, since it may be
 		// important.
-		args := strings.Trim(fmt.Sprint(args), "[]")
+		argv := strings.Trim(fmt.Sprint(argv), "[]")
 
-		return stdout.Bytes(), fmt.Errorf("go %v: %w: %s", args, err, stderr)
+		return stdout.Bytes(), fmt.Errorf("go %v: %w: %s", argv, err, stderr)
 	}
 	if stderr.Len() != 0 && os.Getenv("GOCMDDEBUG") != "" {
-		args := strings.Trim(fmt.Sprint(args), "[]")
-		log.Printf("go %v: %s", args, stderr)
+		argv := strings.Trim(fmt.Sprint(argv), "[]")
+		log.Printf("go %v: %s", argv, stderr)
 	}
 
 	return stdout.Bytes(), nil
