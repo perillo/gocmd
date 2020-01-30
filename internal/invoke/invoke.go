@@ -32,9 +32,9 @@ type Attr struct {
 // implicitly assumes that the cmd/go command is invoked with the -json flag
 // set.
 //
-// If the go command returns a non 0 exit status, Go will return the possibly
-// non empty stdout content and the error as returned by the exec package, with
-// the stderr content as additional context.
+// If the go command returns a non 0 exit status, Go will return the stdout
+// content, or nil if empty, and the error as returned by the exec package,
+// with the stderr content as additional context.
 //
 // If the go command returns a 0 exit status, Go will return the possibly empty
 // stdout content and a nil error.  The stderr content will be ignored, unless
@@ -56,10 +56,14 @@ func Go(verb string, argv []string, attr *Attr) ([]byte, error) {
 	if err := cmd.Run(); err != nil {
 		// Just return the error, including the stderr output as is.
 		// Make sure to also return the stdout content, since it may be
-		// important.
+		// important.  But only if it is not empty.
 		argv := strings.Trim(fmt.Sprint(argv), "[]")
+		var buf []byte
+		if stdout.Len() > 0 {
+			buf = stdout.Bytes()
+		}
 
-		return stdout.Bytes(), fmt.Errorf("go %v: %w: %s", argv, err, stderr)
+		return buf, fmt.Errorf("go %v: %w: %s", argv, err, stderr)
 	}
 	if stderr.Len() != 0 && os.Getenv("GOCMDDEBUG") != "" {
 		argv := strings.Trim(fmt.Sprint(argv), "[]")

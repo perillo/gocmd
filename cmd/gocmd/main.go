@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		tstderr.WriteString(err.Error())
 	}
-	if len(stdout) != 0 {
+	if stdout != nil {
 		tstdout.Write(stdout)
 	}
 }
