@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/perillo/gocmd/internal/invoke"
@@ -20,6 +21,7 @@ var (
 	tstdout *writer = &writer{prefix: "STDOUT "}
 	tstderr *writer = &writer{prefix: "STDERR "}
 	tlog    *writer = &writer{prefix: "LOG    "}
+	gopath          = thegopath()
 )
 
 func main() {
@@ -55,7 +57,7 @@ func (w *writer) Write(buf []byte) (int, error) {
 		b.WriteByte('\n')
 	}
 
-	return os.Stdout.Write(b.Bytes())
+	return w.emit(b)
 }
 
 func (w *writer) WriteString(buf string) (int, error) {
@@ -67,5 +69,25 @@ func (w *writer) WriteString(buf string) (int, error) {
 		b.WriteByte('\n')
 	}
 
-	return os.Stdout.Write(b.Bytes())
+	return w.emit(b)
+}
+
+func (w *writer) emit(b bytes.Buffer) (int, error) {
+	// Make any path inside $GOPATH relative to $GOPATH.
+	buf := b.Bytes()
+	if gopath != nil {
+		buf = bytes.Replace(buf, gopath, []byte("$gopath"), -1)
+	}
+
+	return os.Stdout.Write(buf)
+}
+
+func thegopath() []byte {
+	path := os.Getenv("GOPATH")
+	if path == "" {
+		return nil
+	}
+	list := filepath.SplitList(path)
+
+	return []byte(list[0])
 }
