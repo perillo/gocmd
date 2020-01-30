@@ -14,11 +14,12 @@ package debug
 import (
 	"bytes"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
-var gopath = thegopath()
+// mkrel is a function that will make all absolute paths in b relative to
+// $GOBIN, $GOCACHE and $GOPATH.
+var mkrel func(b []byte) []byte
 
 // Stdout, Stderr and Stdlog are io.Writer that allow to multiplex output
 // directed to stdout, stderr or logged by the standard log package to stdout.
@@ -61,19 +62,13 @@ func (w *Writer) WriteString(buf string) (int, error) {
 func (w *Writer) emit(b bytes.Buffer) (int, error) {
 	// Make any path inside $GOPATH relative to $GOPATH.
 	buf := b.Bytes()
-	if gopath != nil {
-		buf = bytes.Replace(buf, gopath, []byte("$gopath"), -1)
+	if mkrel != nil {
+		buf = mkrel(buf)
 	}
 
 	return os.Stdout.Write(buf)
 }
 
-func thegopath() []byte {
-	path := os.Getenv("GOPATH")
-	if path == "" {
-		return nil
-	}
-	list := filepath.SplitList(path)
-
-	return []byte(list[0])
+func init() {
+	mkrel = initenv()
 }
