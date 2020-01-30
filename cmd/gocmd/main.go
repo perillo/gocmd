@@ -16,11 +16,17 @@ import (
 )
 
 func main() {
+	log.SetFlags(0)
+
 	// Set the GOCMDDEBUG environment variable to debug some corner cases.
 	os.Setenv("GOCMDDEBUG", "on")
 
-	log.SetFlags(0)
-	log.SetOutput(debug.Stdlog)
+	// Initialize the debug environment.
+	if err := debug.Init(); err != nil {
+		log.Fatal(err)
+	}
+
+	// check command line arguments.
 	if len(os.Args) == 1 {
 		return
 	}

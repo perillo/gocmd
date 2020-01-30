@@ -13,20 +13,20 @@ import (
 )
 
 // TODO(mperillo): Export the initenv function and handle errors.
-func initenv() func([]byte) []byte {
+func initenv() (func([]byte) []byte, error) {
 	stdout, err := goenv()
 	if err != nil {
 		// Should never happen.
-		return nil
+		return nil, err
 	}
 
 	var tmp map[string]string
 	if err := json.Unmarshal(stdout, &tmp); err != nil {
-		return nil
+		return nil, err
 	}
 	env := flatenv(tmp)
 
-	return func(b []byte) []byte {
+	f := func(b []byte) []byte {
 		for _, ent := range env {
 			old := []byte(ent.value)
 			new := []byte("$" + ent.key)
@@ -35,6 +35,8 @@ func initenv() func([]byte) []byte {
 
 		return b
 	}
+
+	return f, nil
 }
 
 type entry struct {

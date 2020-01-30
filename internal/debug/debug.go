@@ -13,6 +13,7 @@ package debug
 
 import (
 	"bytes"
+	"log"
 	"os"
 	"strings"
 )
@@ -69,6 +70,19 @@ func (w *Writer) emit(b bytes.Buffer) (int, error) {
 	return os.Stdout.Write(buf)
 }
 
-func init() {
-	mkrel = initenv()
+// Init initializes the debug environment.
+// It also sets the standard log output to Stdlog.
+func Init() error {
+	// Initialize the environment and set the global mkrel variable.
+	f, err := initenv()
+	if err != nil {
+		return err
+	}
+	mkrel = f
+
+	// Configure the standard logger to use debug.Stdlog.
+	log.SetOutput(Stdlog)
+
+	// Unfortunately we can not change os.Stdout and os.Stderr.
+	return nil
 }
