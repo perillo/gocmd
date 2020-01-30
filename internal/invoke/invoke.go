@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package invoke implements a simple api to invoke a cmd/go command and return
-// its stdout content or an error.
+// its stdout content and an error.
 package invoke
 
 import (
@@ -15,31 +15,32 @@ import (
 	"strings"
 )
 
-// Attr holds the attributes that will be applied to the Go command.
+// Attr holds the attributes that will be applied to the cmd/go command.
 type Attr struct {
-	// Env specifies the environment of the Go command.
+	// Env specifies the environment of the cmd/go command.
 	// Each entry is of the form "key=value".
-	// If Env is nil, the Go command uses the current process's environment.
+	// If Env is nil, the cmd/go command uses the current process's
+	// environment.
 	Env []string
 
-	// Dir specifies the working directory of the Go command.
-	// If Dir is the empty string, the Go command runs in the calling process's
-	// current directory.
+	// Dir specifies the working directory of the cmd/go command.
+	// If Dir is the empty string, the cmd/go command runs in the calling
+	// process's current directory.
 	Dir string
 }
 
-// Go invokes a cmd/go command and returns its stdout content or an error.  It
+// Go invokes a cmd/go command and returns its stdout content and an error.  It
 // implicitly assumes that the cmd/go command is invoked with the -json flag
 // set.
 //
-// If the go command returns a non 0 exit status, Go will return the stdout
+// If the cmd/go command returns a non 0 exit status, Go will return the stdout
 // content, or nil if empty, and the error as returned by the exec package,
 // with the stderr content as additional context.
 //
-// If the go command returns a 0 exit status, Go will return the possibly empty
-// stdout content and a nil error.  The stderr content will be ignored, unless
-// the GOCMDDEBUG environment variable is not empty, in which case it will be
-// logged using the log package.
+// If the cmd/go command returns a 0 exit status, Go will return the possibly
+// empty stdout content and a nil error.  The stderr content will be ignored,
+// unless the GOCMDDEBUG environment variable is not empty, in which case it
+// will be logged using the log package.
 func Go(verb string, argv []string, attr *Attr) ([]byte, error) {
 	argv = append([]string{verb}, argv...)
 	stdout := new(bytes.Buffer)
