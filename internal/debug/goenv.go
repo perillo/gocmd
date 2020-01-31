@@ -12,7 +12,6 @@ import (
 	"github.com/perillo/gocmd/internal/invoke"
 )
 
-// TODO(mperillo): Export the initenv function and handle errors.
 func initenv() (func([]byte) []byte, error) {
 	stdout, err := goenv()
 	if err != nil {
