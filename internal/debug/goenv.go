@@ -75,6 +75,11 @@ func flatenv(env map[string]string) []entry {
 
 			continue
 		}
+		if v == "" {
+			// Should not happen.
+			continue
+		}
+
 		ent := entry{
 			key:   k,
 			value: v,
