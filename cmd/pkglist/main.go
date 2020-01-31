@@ -3,12 +3,17 @@
 // license that can be found in the LICENSE file.
 
 // Command pkglist is used for debugging the pkglist package.
-// The output from stdout, stderr and the standard log is redirected to stdout,
-// and each line is printed with a prefix indicating the origin.
+//
+// When the -debug flag is set, the output from stdout, stderr and the standard
+// log is redirected to stdout, and each line is printed with a prefix
+// indicating the origin.
 package main
 
 import (
 	"encoding/json"
+	"flag"
+	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -16,24 +21,38 @@ import (
 	"github.com/perillo/gocmd/pkglist"
 )
 
+var (
+	debugging = flag.Bool("debug", false, "enable debugging")
+)
+
+var (
+	stdout io.Writer = os.Stdout
+	stderr io.Writer = os.Stderr
+)
+
 func main() {
 	log.SetFlags(0)
+	flag.Parse()
 
-	// Set the GOCMDDEBUG environment variable to debug some corner cases.
-	os.Setenv("GOCMDDEBUG", "on")
+	if *debugging {
+		// Set the GOCMDDEBUG environment variable to debug some corner cases.
+		os.Setenv("GOCMDDEBUG", "on")
 
-	// Initialize the debug environment.
-	if err := debug.Init(); err != nil {
-		log.Fatal(err)
+		// Initialize the debug environment.
+		if err := debug.Init(); err != nil {
+			log.Fatal(err)
+		}
+		stdout = debug.Stdout
+		stderr = debug.Stderr
 	}
 
-	pkglist, err := pkglist.Load(os.Args[1:]...)
+	pkglist, err := pkglist.Load(flag.Args()...)
 	if err != nil {
-		debug.Stderr.WriteString(err.Error())
+		fmt.Fprint(stderr, err)
 	}
 
 	// Encode packages.
-	enc := json.NewEncoder(debug.Stdout)
+	enc := json.NewEncoder(stdout)
 	enc.SetIndent("", "\t")
 	for _, pkg := range pkglist {
 		if err := enc.Encode(pkg); err != nil {
