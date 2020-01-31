@@ -55,7 +55,7 @@ func fromInternal(mod *moduleJSON) *Module {
 	r.Zip = mod.Zip
 	r.Dir = mod.Zip
 	r.Sum = mod.Sum
-	r.GoModSum = r.GoModSum
+	r.GoModSum = mod.GoModSum
 	if mod.Error != "" {
 		r.Error = &ModuleError{Err: mod.Error}
 	}
