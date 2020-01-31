@@ -15,7 +15,6 @@ import (
 	"bytes"
 	"log"
 	"os"
-	"strings"
 )
 
 // mkrel is a function that will make all absolute paths in b relative to
@@ -42,18 +41,6 @@ func (w *Writer) Write(buf []byte) (int, error) {
 	for _, line := range bytes.Split(buf, []byte("\n")) {
 		b.WriteString(w.prefix)
 		b.Write(line)
-		b.WriteByte('\n')
-	}
-
-	return w.emit(b)
-}
-
-func (w *Writer) WriteString(buf string) (int, error) {
-	var b bytes.Buffer
-
-	for _, line := range strings.Split(buf, "\n") {
-		b.WriteString(w.prefix)
-		b.WriteString(line)
 		b.WriteByte('\n')
 	}
 
