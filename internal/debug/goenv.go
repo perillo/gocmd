@@ -47,10 +47,10 @@ func goenv() ([]byte, error) {
 	// We need GOBIN and GOCACHE in addition to GOPATH because, as an example:
 	//
 	// go list -json -compiled
-	// returns path relative to GOCACHE in CompiledGoFiles.
+	// returns path relative to $GOCACHE in CompiledGoFiles.
 	//
 	// go list -json -export
-	// returns path relative to GOBIN in Target and relative to GOCACHE in
+	// returns path relative to $GOBIN in Target and relative to $GOCACHE in
 	// Export.
 	argv := []string{"-json", "GOBIN", "GOCACHE", "GOPATH"}
 
@@ -59,7 +59,7 @@ func goenv() ([]byte, error) {
 	return invoke.Go("env", argv, nil)
 }
 
-// flatenv flattens env.  It splits GOPATH into duplicate entries.
+// flatenv flattens env.  It splits $GOPATH into duplicate entries.
 func flatenv(env map[string]string) []entry {
 	buf := make([]entry, 0, len(env))
 	for k, v := range env {

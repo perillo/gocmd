@@ -8,7 +8,7 @@
 // multiplex the output from stdout, stderr and the standard log package to
 // stdout.
 // It will also make all the absolute paths read from cmd/go relative to
-// $GOPATH.
+// $GOBIN, $GOCACHE and $GOPATH.
 package debug
 
 import (
@@ -61,7 +61,7 @@ func (w *Writer) WriteString(buf string) (int, error) {
 }
 
 func (w *Writer) emit(b bytes.Buffer) (int, error) {
-	// Make any path inside $GOPATH relative to $GOPATH.
+	// Make any absolute path relative to either $GOBIN, $GOCACHE or $GOPATH.
 	buf := b.Bytes()
 	if mkrel != nil {
 		buf = mkrel(buf)
