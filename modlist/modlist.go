@@ -15,11 +15,11 @@ import (
 
 // Loader is used to provide custom options for loading modules.
 type Loader struct {
-	// Dir is the directory in which to run the go list command.
+	// Dir is the directory in which to run the go list -m command.
 	// If Dir is empty, go list is run in the current directory.
 	Dir string
 
-	// Env is the environment to use when invoking go list.
+	// Env is the environment to use when invoking go list -m.
 	// If Env is nil, the current environment is used.
 	Env []string
 }
