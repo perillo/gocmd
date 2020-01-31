@@ -8,6 +8,9 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -15,15 +18,29 @@ import (
 	"github.com/perillo/gocmd/internal/invoke"
 )
 
+var (
+	debugging = flag.Bool("debug", false, "enable debugging")
+)
+
+var (
+	stdout io.Writer = os.Stdout
+	stderr io.Writer = os.Stderr
+)
+
 func main() {
 	log.SetFlags(0)
+	flag.Parse()
 
-	// Set the GOCMDDEBUG environment variable to debug some corner cases.
-	os.Setenv("GOCMDDEBUG", "on")
+	if *debugging {
+		// Set the GOCMDDEBUG environment variable to debug some corner cases.
+		os.Setenv("GOCMDDEBUG", "on")
 
-	// Initialize the debug environment.
-	if err := debug.Init(); err != nil {
-		log.Fatal(err)
+		// Initialize the debug environment.
+		if err := debug.Init(); err != nil {
+			log.Fatal(err)
+		}
+		stdout = debug.Stdout
+		stderr = debug.Stderr
 	}
 
 	// check command line arguments.
@@ -31,11 +48,11 @@ func main() {
 		return
 	}
 
-	stdout, err := invoke.Go(os.Args[1], os.Args[2:], nil)
+	data, err := invoke.Go(flag.Arg(0), flag.Args()[1:], nil)
 	if err != nil {
-		debug.Stderr.WriteString(err.Error())
+		fmt.Fprint(stderr, err)
 	}
 	if stdout != nil {
-		debug.Stdout.Write(stdout)
+		stdout.Write(data)
 	}
 }
