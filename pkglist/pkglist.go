@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// The pkglist package api has been partially influenced by
+// golang.org/x/tools/go/packages.
+
 // Package pkglist is a wrapper for the go list command.
 package pkglist
 
