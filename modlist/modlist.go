@@ -39,7 +39,7 @@ func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 		return nil, err
 	}
 
-	// Decode the module.
+	// Decode the modules.
 	modlist := make([]*Module, 0, 10)
 	buf := bytes.NewBuffer(stdout)
 	for dec := json.NewDecoder(buf); dec.More(); {
