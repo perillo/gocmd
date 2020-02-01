@@ -36,12 +36,28 @@ func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 
 	stdout, err := invoke.Go("mod", argv, &attr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("modfetch: load: %w", err)
+	}
+	modlist, err := decode(stdout)
+	if err != nil {
+		return nil, fmt.Errorf("modfetch: load: %w", err)
 	}
 
-	// Decode the modules.
+	return modlist, nil
+}
+
+// Load loads and returns the Go modules named by the given patterns, using
+// the default loader configuration.
+// The patterns are the same as the ones used by go mod download.
+func Load(patterns ...string) ([]*Module, error) {
+	var l Loader
+
+	return l.Load(patterns...)
+}
+
+func decode(data []byte) ([]*Module, error) {
 	modlist := make([]*Module, 0, 10)
-	buf := bytes.NewBuffer(stdout)
+	buf := bytes.NewBuffer(data)
 	for dec := json.NewDecoder(buf); dec.More(); {
 		tmp := new(moduleJSON)
 		if err := dec.Decode(tmp); err != nil {
@@ -52,14 +68,5 @@ func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 		modlist = append(modlist, mod)
 	}
 
-	return modlist, err
-}
-
-// Load loads and returns the Go modules named by the given patterns, using
-// the default loader configuration.
-// The patterns are the same as the ones used by go mod download.
-func Load(patterns ...string) ([]*Module, error) {
-	var l Loader
-
-	return l.Load(patterns...)
+	return modlist, nil
 }
