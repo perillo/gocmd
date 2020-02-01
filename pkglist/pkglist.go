@@ -68,7 +68,6 @@ func decode(data []byte) ([]*Package, error) {
 			return nil, fmt.Errorf("JSON decode: %w", err)
 		}
 
-		// Make the source file paths absolute.
 		pkg = normalize(pkg)
 		pkglist = append(pkglist, pkg)
 	}
@@ -76,7 +75,7 @@ func decode(data []byte) ([]*Package, error) {
 	return pkglist, nil
 }
 
-// normalizes ensures all the source file paths are absolute, for consistency.
+// normalize ensures all the source file paths are absolute, for consistency.
 func normalize(pkg *Package) *Package {
 	abspaths(pkg.Dir, pkg.GoFiles)
 	abspaths(pkg.Dir, pkg.CgoFiles)
