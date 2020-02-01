@@ -40,12 +40,28 @@ func (l *Loader) Load(patterns ...string) ([]*Package, error) {
 
 	stdout, err := invoke.Go("list", argv, &attr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("pkglist: load: %w", err)
+	}
+	pkglist, err := decode(stdout)
+	if err != nil {
+		return nil, fmt.Errorf("pkglist: load: %w", err)
 	}
 
-	// Decode the packages.
+	return pkglist, nil
+}
+
+// Load loads and returns the Go packages named by the given patterns, using
+// the default loader configuration.
+// The patterns are the same as the ones used by go list.
+func Load(patterns ...string) ([]*Package, error) {
+	var l Loader
+
+	return l.Load(patterns...)
+}
+
+func decode(data []byte) ([]*Package, error) {
 	pkglist := make([]*Package, 0, 10)
-	buf := bytes.NewBuffer(stdout)
+	buf := bytes.NewBuffer(data)
 	for dec := json.NewDecoder(buf); dec.More(); {
 		pkg := new(Package)
 		if err := dec.Decode(pkg); err != nil {
@@ -57,16 +73,7 @@ func (l *Loader) Load(patterns ...string) ([]*Package, error) {
 		pkglist = append(pkglist, pkg)
 	}
 
-	return pkglist, err
-}
-
-// Load loads and returns the Go packages named by the given patterns, using
-// the default loader configuration.
-// The patterns are the same as the ones used by go list.
-func Load(patterns ...string) ([]*Package, error) {
-	var l Loader
-
-	return l.Load(patterns...)
+	return pkglist, nil
 }
 
 // normalizes ensures all the source file paths are absolute, for consistency.
