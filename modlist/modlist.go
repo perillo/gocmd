@@ -36,22 +36,14 @@ func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 
 	stdout, err := invoke.Go("list", argv, &attr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("modlist: load: %w", err)
+	}
+	modlist, err := decode(stdout)
+	if err != nil {
+		return nil, fmt.Errorf("modlist: load: %w", err)
 	}
 
-	// Decode the modules.
-	modlist := make([]*Module, 0, 10)
-	buf := bytes.NewBuffer(stdout)
-	for dec := json.NewDecoder(buf); dec.More(); {
-		mod := new(Module)
-		if err := dec.Decode(mod); err != nil {
-			return nil, fmt.Errorf("JSON decode: %w", err)
-		}
-
-		modlist = append(modlist, mod)
-	}
-
-	return modlist, err
+	return modlist, nil
 }
 
 // Load loads and returns the Go modules named by the given patterns, using
@@ -61,4 +53,19 @@ func Load(patterns ...string) ([]*Module, error) {
 	var l Loader
 
 	return l.Load(patterns...)
+}
+
+func decode(data []byte) ([]*Module, error) {
+	modlist := make([]*Module, 0, 10)
+	buf := bytes.NewBuffer(data)
+	for dec := json.NewDecoder(buf); dec.More(); {
+		mod := new(Module)
+		if err := dec.Decode(mod); err != nil {
+			return nil, fmt.Errorf("JSON decode: %w", err)
+		}
+
+		modlist = append(modlist, mod)
+	}
+
+	return modlist, nil
 }
