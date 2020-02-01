@@ -18,7 +18,7 @@ import (
 )
 
 // mkrel is a function that will make all absolute paths in b relative to
-// $GOBIN, $GOCACHE and $GOPATH.
+// $GOBIN, $GOCACHE, $GOPATH and $GOROOT.
 var mkrel func(b []byte) []byte
 
 // Stdout, Stderr and Stdlog are io.Writer that allow to multiplex output
@@ -48,7 +48,8 @@ func (w *Writer) Write(buf []byte) (int, error) {
 }
 
 func (w *Writer) emit(b bytes.Buffer) (int, error) {
-	// Make any absolute path relative to either $GOBIN, $GOCACHE or $GOPATH.
+	// Make any absolute path relative to either $GOBIN, $GOCACHE, $GOPATH or
+	// $GOROOT.
 	buf := b.Bytes()
 	if mkrel != nil {
 		buf = mkrel(buf)

@@ -44,7 +44,8 @@ type entry struct {
 }
 
 func goenv() ([]byte, error) {
-	// We need GOBIN and GOCACHE in addition to GOPATH because, as an example:
+	// We need GOBIN, GOCACHE and GOROOT in addition to GOPATH because, as an
+	// example:
 	//
 	// go list -json -compiled
 	// returns path relative to $GOCACHE in CompiledGoFiles.
@@ -52,7 +53,10 @@ func goenv() ([]byte, error) {
 	// go list -json -export
 	// returns path relative to $GOBIN in Target and relative to $GOCACHE in
 	// Export.
-	argv := []string{"-json", "GOBIN", "GOCACHE", "GOPATH"}
+	//
+	// go list -json flag
+	// returns a path relative to $GOROOT in Target.
+	argv := []string{"-json", "GOBIN", "GOCACHE", "GOPATH", "GOROOT"}
 
 	// Unfortunately, `go env -json x` returns an exit status 0 and the JSON
 	// object { "x": "" }
