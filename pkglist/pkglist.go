@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 
 	"github.com/perillo/gocmd/internal/invoke"
 )
@@ -51,7 +52,8 @@ func (l *Loader) Load(patterns ...string) ([]*Package, error) {
 			return nil, fmt.Errorf("JSON decode: %w", err)
 		}
 
-		// TODO(mperillo): Make the source file paths absolute.
+		// Make the source file paths absolute.
+		pkg = normalize(pkg)
 		pkglist = append(pkglist, pkg)
 	}
 
@@ -65,4 +67,34 @@ func Load(patterns ...string) ([]*Package, error) {
 	var l Loader
 
 	return l.Load(patterns...)
+}
+
+// normalizes ensures all the source file paths are absolute, for consistency.
+func normalize(pkg *Package) *Package {
+	abspaths(pkg.Dir, pkg.GoFiles)
+	abspaths(pkg.Dir, pkg.CgoFiles)
+	//abspaths(pkg.Dir, pkg.CompiledGoFiles)
+	abspaths(pkg.Dir, pkg.IgnoredGoFiles)
+	abspaths(pkg.Dir, pkg.CFiles)
+	abspaths(pkg.Dir, pkg.CXXFiles)
+	abspaths(pkg.Dir, pkg.MFiles)
+	abspaths(pkg.Dir, pkg.HFiles)
+	abspaths(pkg.Dir, pkg.FFiles)
+	abspaths(pkg.Dir, pkg.SFiles)
+	abspaths(pkg.Dir, pkg.SwigFiles)
+	abspaths(pkg.Dir, pkg.SwigCXXFiles)
+	abspaths(pkg.Dir, pkg.SysoFiles)
+	abspaths(pkg.Dir, pkg.TestGoFiles)
+	abspaths(pkg.Dir, pkg.XTestGoFiles)
+
+	return pkg
+}
+
+func abspaths(dir string, names []string) []string {
+	for i, name := range names {
+		path := filepath.Join(dir, name)
+		names[i] = path
+	}
+
+	return names
 }
