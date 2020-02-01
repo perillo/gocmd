@@ -24,7 +24,7 @@ type Loader struct {
 	Env []string
 }
 
-// Load fetchs and returns the Go modules named by the given patterns.
+// Load downloads and returns the Go modules named by the given patterns.
 // The patterns are the same as the ones used by go mod download.
 func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 	attr := invoke.Attr{
@@ -39,7 +39,7 @@ func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 		return nil, err
 	}
 
-	// Decode the module.
+	// Decode the modules.
 	modlist := make([]*Module, 0, 10)
 	buf := bytes.NewBuffer(stdout)
 	for dec := json.NewDecoder(buf); dec.More(); {
