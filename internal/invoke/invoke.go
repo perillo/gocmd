@@ -55,7 +55,7 @@ func Go(verb string, argv []string, attr *Attr) ([]byte, error) {
 	}
 
 	if err := cmd.Run(); err != nil {
-		// Just return the error, including the stderr output as is.
+		// Just return the error, including the non empty stderr output as is.
 		// Make sure to also return the stdout content, since it may be
 		// important.  But only if it is not empty.
 		argv := strings.Trim(fmt.Sprint(argv), "[]")
@@ -63,8 +63,11 @@ func Go(verb string, argv []string, attr *Attr) ([]byte, error) {
 		if stdout.Len() > 0 {
 			buf = stdout.Bytes()
 		}
+		if stderr.Len() > 0 {
+			return buf, fmt.Errorf("go %v: %w: %s", argv, err, stderr)
+		}
 
-		return buf, fmt.Errorf("go %v: %w: %s", argv, err, stderr)
+		return buf, fmt.Errorf("go %v: %w", argv, err)
 	}
 	if stderr.Len() != 0 && os.Getenv("GOCMDDEBUG") != "" {
 		argv := strings.Trim(fmt.Sprint(argv), "[]")
