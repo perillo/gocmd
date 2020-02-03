@@ -129,6 +129,68 @@ func (c *Config) invokeGo(argv []string) ([]byte, error) {
 	return invoke.Go("env", argv, &attr)
 }
 
+// Get returns the entire Go environment as a map, using the default
+// configuration.
+//
+// It one or more variable names is given as arguments, Get returns each named
+// variable.  If a variable does not exists, the associated value will be the
+// empty string.
+func Get(vars ...string) (map[string]string, error) {
+	var c Config
+
+	return c.Get(vars...)
+}
+
+// Set changes the default settings of the named environment variables
+// specified in env, using the default configuration.
+//
+// If one or more variables does not exist, Set returns an error.
+func Set(env map[string]string) error {
+	var c Config
+
+	return c.Set(env)
+}
+
+// Unset unsets the default settings for the named Go environment variables, if
+// one has been set with Set or Setenv, using the default configuration.
+//
+// If one or more variables does not exist, Unset returns an error.
+func Unset(vars ...string) error {
+	var c Config
+
+	return c.Unset(vars...)
+}
+
+// Getenv returns the named Go environment variable, using the default
+// configuration.
+//
+// If key does not exist, Getenv returns an empty string.
+func Getenv(key string) (string, error) {
+	var c Config
+
+	return c.Getenv(key)
+}
+
+// Setenv changes the default setting of the named Go environment variable to
+// the given value, using the default configuration.
+//
+// If key does not exist, Setenv returns an error.
+func Setenv(key, value string) error {
+	var c Config
+
+	return c.Setenv(key, value)
+}
+
+// Unsetenv unsets the default setting for the named Go environment variable,
+// if one has been set with Set or Setenv, using the default configuration.
+//
+// If key does not exist, Unsetenv returns an error.
+func Unsetenv(key string) error {
+	var c Config
+
+	return c.Unsetenv(key)
+}
+
 func decode(data []byte) (env map[string]string, err error) {
 	if err := json.Unmarshal(data, &env); err != nil {
 		return nil, fmt.Errorf("JSON decode: %w", err)
