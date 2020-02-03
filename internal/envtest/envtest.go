@@ -68,7 +68,7 @@ func (f *File) Remove() error {
 
 // Utility functions.
 
-// Key returns the sorted sequence of env keys.
+// Keys returns the sorted sequence of env keys.
 func Keys(env map[string]string) []string {
 	buf := make([]string, 0, len(env))
 	for key, _ := range env {
