@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/perillo/gocmd/internal/invoke"
 )
@@ -43,8 +44,14 @@ func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 
 	stdout, err := invoke.Go("mod", argv, &attr)
 	if err != nil {
+		// go mod download -json does not reports errors on stderr, so we need
+		// to collect them from stdout in order to offer a consistent api.
+		err := err.(*Error)
+		err.Stderr = []byte(collect(stdout))
+
 		return nil, fmt.Errorf("modfetch: load: %w", err)
 	}
+
 	modlist, err := decode(stdout)
 	if err != nil {
 		return nil, fmt.Errorf("modfetch: load: %w", err)
@@ -64,6 +71,28 @@ func Load(patterns ...string) ([]*Module, error) {
 	var l Loader
 
 	return l.Load(patterns...)
+}
+
+// collect collects and return all the errors reported by invoke.Go and stored
+// in the Module.Error field.
+//
+// The returned string will contain the errors as they where reported on
+// stderr.
+func collect(data []byte) string {
+	modlist, err := decode(data)
+	if err != nil {
+		// TODO(mperillo): log.Printf("JSON decode: %v", err) in collect.
+		return ""
+	}
+
+	var buf []string
+	for _, mod := range modlist {
+		if mod.Error != nil {
+			buf = append(buf, mod.Error.Err)
+		}
+	}
+
+	return strings.Join(buf, "\n")
 }
 
 func decode(data []byte) ([]*Module, error) {
