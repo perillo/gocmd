@@ -5,7 +5,9 @@
 package pkglist
 
 import (
+	"errors"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -26,5 +28,30 @@ func TestLoad(t *testing.T) {
 	got := pkgs[0].Name
 	if got != want {
 		t.Errorf("load: got %q, want %q", got, want)
+	}
+}
+
+// TestLoadFail tests that the Load function in case of failure reports the
+// error details in Error.Stderr.
+func TestLoadFail(t *testing.T) {
+	l := Loader{
+		Dir: os.TempDir(),
+	}
+
+	pkgs, err := l.Load("xxx")
+	if err == nil {
+		t.Error("expected an error")
+	}
+	if pkgs != nil {
+		t.Errorf("expected the data to be nil, got %v", pkgs)
+	}
+
+	// TODO(mperillo): Ensure that the test is not brittle.
+	err = errors.Unwrap(err)
+	stderr := string(err.(*Error).Stderr)
+	pattern := "package xxx: malformed module path"
+
+	if !strings.Contains(stderr, pattern) {
+		t.Errorf("stderr does not contain pattern %q, got %q", pattern, stderr)
 	}
 }
