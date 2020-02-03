@@ -42,6 +42,11 @@ func NewFile(t *testing.T) *File {
 	return &File{f, t, c}
 }
 
+// Name returns the GOENV file name.
+func (f *File) Name() string {
+	return f.f.Name()
+}
+
 // Read reads the entire content of the GOENV file.  It can be called multiple
 // times.
 func (f *File) Read() string {

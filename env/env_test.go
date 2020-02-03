@@ -134,11 +134,11 @@ func TestGetUnknown(t *testing.T) {
 	goenv := envtest.NewFile(t)
 	defer goenv.Remove()
 
+	want := map[string]string{"XX": ""}
 	got, err := goenv.Config.Get("XX")
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := map[string]string{"XX": ""}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("get: got %q, want %w", got, want)
 	}
@@ -227,6 +227,21 @@ func TestInvalidVariable(t *testing.T) {
 	}
 	if _, err := goenv.Config.Getenv(key); err == nil {
 		t.Errorf("getenv: expected error")
+	}
+}
+
+// TestGetGOENV tests the Getenv function with the GOENV variable.
+func TestGetGOENV(t *testing.T) {
+	goenv := envtest.NewFile(t)
+	defer goenv.Remove()
+
+	want := goenv.Name()
+	got, err := goenv.Config.Getenv("GOENV")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != want {
+		t.Errorf("getenv GOENV: got %q, want %q", got, want)
 	}
 }
 
