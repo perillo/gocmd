@@ -229,3 +229,20 @@ func TestInvalidVariable(t *testing.T) {
 		t.Errorf("getenv: expected error")
 	}
 }
+
+// TestSetGOENV tests the Setenv and Unsetenv functions with the GOENV
+// variable.
+func TestSetGOENV(t *testing.T) {
+	goenv := envtest.NewFile(t)
+	defer goenv.Remove()
+
+	// GOENV can only be set using the OS environment.
+	const key = "GOENV"
+
+	if err := goenv.Config.Setenv(key, "xxx"); err == nil {
+		t.Errorf("get: expected error")
+	}
+	if err := goenv.Config.Unsetenv(key); err == nil {
+		t.Errorf("getenv: expected error")
+	}
+}

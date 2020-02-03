@@ -17,7 +17,7 @@ import (
 // Config is used to provide custom options for accessing the Go environment.
 type Config struct {
 	// Path is the path in which the Go environment configuration file is
-	// stored.
+	// stored.  If not specified, GOENV will be used.
 	Path string
 }
 
