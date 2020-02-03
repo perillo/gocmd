@@ -43,22 +43,3 @@ type ModuleError struct {
 func (me *ModuleError) Error() string {
 	return me.Err
 }
-
-// fromInternal converts mod from the moduleJSON type used by go mod download,
-// to the Module type used by the modfetch package.
-func fromInternal(mod *moduleJSON) *Module {
-	r := new(Module)
-	r.Path = mod.Path
-	r.Version = mod.Version
-	r.Info = mod.Info
-	r.GoMod = mod.GoMod
-	r.Zip = mod.Zip
-	r.Dir = mod.Zip
-	r.Sum = mod.Sum
-	r.GoModSum = mod.GoModSum
-	if mod.Error != "" {
-		r.Error = &ModuleError{Err: mod.Error}
-	}
-
-	return r
-}
