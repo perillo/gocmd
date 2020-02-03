@@ -44,7 +44,7 @@ func main() {
 	}
 
 	// check command line arguments.
-	if len(os.Args) == 1 {
+	if flag.NArg() == 0 {
 		return
 	}
 
