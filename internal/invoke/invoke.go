@@ -39,7 +39,7 @@ type Error struct {
 // Error implements the error interface.
 func (e *Error) Error() string {
 	argv := strings.Trim(fmt.Sprint(e.Argv), "[]")
-	stderr := string(e.Stderr)
+	stderr := string(bytes.TrimSpace(e.Stderr))
 	msg := "go " + argv + ": " + e.Err.Error()
 
 	if stderr == "" {
