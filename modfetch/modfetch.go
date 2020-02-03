@@ -13,6 +13,9 @@ import (
 	"github.com/perillo/gocmd/internal/invoke"
 )
 
+// Error is returned by Load in case the go command returns an error.
+type Error = invoke.Error
+
 // Loader is used to provide custom options for fetching modules.
 type Loader struct {
 	// Dir is the directory in which to run the go mod download command.
@@ -26,6 +29,10 @@ type Loader struct {
 
 // Load downloads and returns the Go modules named by the given patterns.
 // The patterns are the same as the ones used by go mod download.
+//
+// If one or more modules cannot be loaded, Load returns a nil slice and an
+// error of type *Error.  If Load returns successfully, the returned modules
+// have all been correctly loaded.
 func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 	attr := invoke.Attr{
 		Dir: l.Dir,
@@ -49,6 +56,10 @@ func (l *Loader) Load(patterns ...string) ([]*Module, error) {
 // Load loads and returns the Go modules named by the given patterns, using
 // the default loader configuration.
 // The patterns are the same as the ones used by go mod download.
+//
+// If one or more modules cannot be loaded, Load returns a nil slice and an
+// error of type *Error.  If Load returns successfully, the returned modules
+// have all been correctly loaded.
 func Load(patterns ...string) ([]*Module, error) {
 	var l Loader
 
