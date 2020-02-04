@@ -54,9 +54,7 @@ func (e *Error) Unwrap() error {
 	return e.Err
 }
 
-// Go invokes a cmd/go command and returns its stdout content and an error.  It
-// implicitly assumes that the cmd/go command is invoked with the -json flag
-// set.
+// Go invokes a cmd/go command and returns its stdout content and an error.
 //
 // If the cmd/go command returns a non 0 exit status, Go will return the stdout
 // content, or nil if empty, and the error will be of type *Error.
