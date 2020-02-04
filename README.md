@@ -8,7 +8,7 @@ and `modfetch` packages that implement a simple *API* for, respectively, the
 
 The `github.com/perillo/gocmd/env` package provides support for accessing the
 *Go* environment.  With the default `Config` any changes to the *Go*
-environment are recorded in the default `GOENV` file.
+environment are recorded in the default `$GOENV` file.
 
 `env` is a wrapper for the `go env` command.
 
@@ -46,11 +46,23 @@ available in `Error.Stderr`.
 `modfetch` is a wrapper for the `go mod download -json` command,
 
 
+## Installing additional commands
+
+The `gocmd` module also provides some diagnostic tools used for testing the
+provided packages: `gocmd`, `gopkglist`, `gomodlist` and `gomodfetch`.
+
+They can be installed with:
+
+```
+go get github.com/perillo/gocmd/cmd/...
+```
+
+
 ## API design
 
 For each of the `Load` function, if one or more `packages`/`modules` can not be
 loaded, the function returns an error, and a nil slice.  The error will be of
-type `Error`, and the error messages are available in the `Stderr` field.
+type `Error`, and the raw error messages are available in the `Stderr` field.
 
 If the `Load` function returns with a `nil` error, it will returns only
 correctly loaded `packages`/`modules`.
