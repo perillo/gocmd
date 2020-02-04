@@ -6,24 +6,17 @@ package debug
 
 import (
 	"bytes"
-	"encoding/json"
 	"path/filepath"
 
-	"github.com/perillo/gocmd/internal/invoke"
+	"github.com/perillo/gocmd/env"
 )
 
 func initenv() (func([]byte) []byte, error) {
-	stdout, err := goenv()
+	env, err := goenv()
 	if err != nil {
 		// Should never happen.
 		return nil, err
 	}
-
-	var tmp map[string]string
-	if err := json.Unmarshal(stdout, &tmp); err != nil {
-		return nil, err
-	}
-	env := flatenv(tmp)
 
 	mkrel := func(b []byte) []byte {
 		// Make all absolute paths in b relative to the paths in env.
@@ -44,7 +37,7 @@ type entry struct {
 	value string
 }
 
-func goenv() ([]byte, error) {
+func goenv() ([]entry, error) {
 	// We need GOBIN, GOCACHE and GOROOT in addition to GOPATH because, as an
 	// example:
 	//
@@ -57,11 +50,12 @@ func goenv() ([]byte, error) {
 	//
 	// go list -json flag
 	// returns a path relative to $GOROOT in Target.
-	argv := []string{"-json", "GOBIN", "GOCACHE", "GOPATH", "GOROOT"}
+	environ, err := env.Get("GOBIN", "GOCACHE", "GOPATH", "GOROOT")
+	if err != nil {
+		return nil, err
+	}
 
-	// Unfortunately, `go env -json x` returns an exit status 0 and the JSON
-	// object { "x": "" }
-	return invoke.Go("env", argv, nil)
+	return flatenv(environ), nil
 }
 
 // flatenv flattens env.  It splits $GOPATH into duplicate entries.
