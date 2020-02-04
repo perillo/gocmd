@@ -25,7 +25,8 @@ func initenv() (func([]byte) []byte, error) {
 	}
 	env := flatenv(tmp)
 
-	f := func(b []byte) []byte {
+	mkrel := func(b []byte) []byte {
+		// Make all absolute paths in b relative to the paths in env.
 		for _, ent := range env {
 			old := []byte(ent.value)
 			new := []byte("$" + ent.key)
@@ -35,7 +36,7 @@ func initenv() (func([]byte) []byte, error) {
 		return b
 	}
 
-	return f, nil
+	return mkrel, nil
 }
 
 type entry struct {
