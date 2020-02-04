@@ -34,7 +34,7 @@ type Writer struct {
 	prefix string
 }
 
-// Write implements the Read interface.
+// Write implements the Writer interface.
 func (w *Writer) Write(buf []byte) (int, error) {
 	var b bytes.Buffer
 
