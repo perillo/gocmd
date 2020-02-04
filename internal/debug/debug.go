@@ -37,7 +37,6 @@ type Writer struct {
 // Write implements the Writer interface.
 func (w *Writer) Write(buf []byte) (int, error) {
 	var b bytes.Buffer
-
 	for _, line := range bytes.Split(buf, []byte("\n")) {
 		b.WriteString(w.prefix)
 		b.Write(line)
@@ -48,8 +47,6 @@ func (w *Writer) Write(buf []byte) (int, error) {
 }
 
 func (w *Writer) emit(b bytes.Buffer) (int, error) {
-	// Make any absolute path relative to either $GOBIN, $GOCACHE, $GOPATH or
-	// $GOROOT.
 	buf := b.Bytes()
 	if mkrel != nil {
 		buf = mkrel(buf)
