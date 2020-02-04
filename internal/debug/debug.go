@@ -8,7 +8,7 @@
 // multiplex the output from stdout, stderr and the standard log package to
 // stdout.
 // It will also make all the absolute paths read from cmd/go relative to
-// $GOBIN, $GOCACHE and $GOPATH.
+// $GOBIN, $GOCACHE, $GOPATH AND $GOROOT.
 package debug
 
 import (
