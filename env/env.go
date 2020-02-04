@@ -200,9 +200,8 @@ func decode(data []byte) (env map[string]string, err error) {
 }
 
 // flatenv flattens env.
-// TODO(mperillo): flatenv does not sort the data since it assumes goenv -w
-// will keep the environment variables sorted.
 func flatenv(env map[string]string) []string {
+	// There is no need to sort the entries, since go env -w will do it.
 	buf := make([]string, 0, len(env))
 	for k, v := range env {
 		ent := k + "=" + v
