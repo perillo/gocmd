@@ -35,11 +35,22 @@ type Module struct {
 	Error    *ModuleError `json:",omitempty"` // error loading module
 }
 
+// String implements the Stringer interface.
+func (m *Module) String() string {
+	s := m.Path
+	if m.Version != "" {
+		s += "@" + m.Version
+	}
+
+	return s
+}
+
 // ModuleError represents a module error.
 type ModuleError struct {
 	Err string // the error itself
 }
 
+// Error implements the error interface.
 func (me *ModuleError) Error() string {
 	return me.Err
 }
